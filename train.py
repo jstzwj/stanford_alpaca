@@ -12,12 +12,15 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import os
+os.environ['CUDA_VISIBLE_DEVICES'] = "4,5,6,7"
 import copy
 import logging
 from dataclasses import dataclass, field
 from typing import Optional, Dict, Sequence
 
 import torch
+from torch import nn
 import transformers
 from torch.utils.data import Dataset
 from transformers import Trainer
@@ -50,7 +53,8 @@ class ModelArguments:
 
 @dataclass
 class DataArguments:
-    data_path: str = field(default=None, metadata={"help": "Path to the training data."})
+    train_dataset: str = field(default=None, metadata={"help": "Path to the training data."})
+    eval_dataset: str = field(default=None, metadata={"help": "Path to the eval data."})
 
 
 @dataclass
@@ -184,12 +188,19 @@ class DataCollatorForSupervisedDataset(object):
 
 def make_supervised_data_module(tokenizer: transformers.PreTrainedTokenizer, data_args) -> Dict:
     """Make dataset and collator for supervised fine-tuning."""
-    train_dataset = SupervisedDataset(tokenizer=tokenizer, data_path=data_args.data_path)
+    train_dataset = SupervisedDataset(tokenizer=tokenizer, data_path=data_args.train_dataset)
+    eval_dataset = SupervisedDataset(tokenizer=tokenizer, data_path=data_args.eval_dataset)
     data_collator = DataCollatorForSupervisedDataset(tokenizer=tokenizer)
-    return dict(train_dataset=train_dataset, eval_dataset=None, data_collator=data_collator)
+    return dict(train_dataset=train_dataset, eval_dataset=eval_dataset, data_collator=data_collator)
 
+from fairscale.nn.checkpoint import checkpoint_wrapper
+from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
+from fairscale.nn import Pipe
+from fairscale.experimental.nn import OffloadModel
 
 def train():
+    local_rank = int(os.environ["LOCAL_RANK"])
+    torch.cuda.set_device(local_rank)
     parser = transformers.HfArgumentParser((ModelArguments, DataArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 

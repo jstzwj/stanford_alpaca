@@ -7,3 +7,4 @@ torch
 sentencepiece
 tokenizers==0.12.1
 wandb
+# git+https://github.com/zphang/transformers.git@llama_push
