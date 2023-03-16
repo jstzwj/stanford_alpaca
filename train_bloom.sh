@@ -1,10 +1,10 @@
 export CUDA_VISIBLE_DEVICES="4,5,6,7"
 torchrun --nproc_per_node=4 --master_port=3389 train.py \
-    --model_name_or_path "models/facebook_opt-1.3b" \
+    --model_name_or_path "models/bigscience_bloom-3b" \
     --train_dataset ./alpaca_data.json \
     --eval_dataset ./alpaca_data_eval.json \
     --fp16 True \
-    --output_dir ./checkpoints/opt-1.3b \
+    --output_dir ./checkpoints/bloom-3b \
     --num_train_epochs 3 \
     --per_device_train_batch_size 2 \
     --per_device_eval_batch_size 1 \
@@ -19,7 +19,7 @@ torchrun --nproc_per_node=4 --master_port=3389 train.py \
     --lr_scheduler_type "cosine" \
     --logging_steps 1 \
     --fsdp "full_shard auto_wrap" \
-    --fsdp_transformer_layer_cls_to_wrap 'OPTDecoderLayer' \
+    --fsdp_transformer_layer_cls_to_wrap 'BloomBlock' \
     --fsdp_config fsdp_config.json \
     --gradient_checkpointing False
 
