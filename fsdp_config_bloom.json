@@ -1,0 +1,4 @@
+{
+    "fsdp_min_num_params": 0,
+    "fsdp_transformer_layer_cls_to_wrap": "BloomBlock"
+}

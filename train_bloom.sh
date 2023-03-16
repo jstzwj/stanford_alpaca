@@ -19,8 +19,7 @@ torchrun --nproc_per_node=4 --master_port=3389 train.py \
     --lr_scheduler_type "cosine" \
     --logging_steps 1 \
     --fsdp "full_shard auto_wrap" \
-    --fsdp_transformer_layer_cls_to_wrap 'BloomBlock' \
-    --fsdp_config fsdp_config.json \
+    --fsdp_config fsdp_config_bloom.json \
     --gradient_checkpointing False
 
 # --deepspeed ds_config.json
