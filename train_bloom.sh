@@ -6,9 +6,9 @@ torchrun --nproc_per_node=4 --master_port=3389 train.py \
     --fp16 True \
     --output_dir ./checkpoints/bloom-3b \
     --num_train_epochs 3 \
-    --per_device_train_batch_size 2 \
+    --per_device_train_batch_size 1 \
     --per_device_eval_batch_size 1 \
-    --gradient_accumulation_steps 16 \
+    --gradient_accumulation_steps 32 \
     --evaluation_strategy "no" \
     --save_strategy "steps" \
     --save_steps 2000 \
